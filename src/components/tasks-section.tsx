@@ -15,7 +15,8 @@ import {
   Calendar,
   Flag,
   MoreVertical,
-  Sparkles 
+  Sparkles,
+  Trash2
 } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 
@@ -75,7 +76,14 @@ export function TasksSection({ showNewTaskModal, setShowNewTaskModal }: TasksSec
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Tasks</h2>
-        <Button onClick={() => setShowNewTaskModal(true)}>New Task</Button>
+        <Button 
+          onClick={() => {
+            console.log('New Task button clicked')
+            setShowNewTaskModal(true)
+          }}
+        >
+          New Task
+        </Button>
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -155,14 +163,28 @@ export function TasksSection({ showNewTaskModal, setShowNewTaskModal }: TasksSec
                               </div>
                             </div>
                             
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => setSelectedTask(task)}
-                            >
-                              <MoreVertical className="h-3 w-3" />
-                            </Button>
+                            <div className="flex items-center space-x-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => pinTask(task.id)}
+                              >
+                                <Star className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-red-500 hover:text-red-700"
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to delete this task?')) {
+                                    deleteTask(task.id)
+                                  }
+                                }}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -246,23 +268,36 @@ export function TasksSection({ showNewTaskModal, setShowNewTaskModal }: TasksSec
               </Button>
               <Button 
                 onClick={() => {
+                  console.log('Create Task button clicked')
+                  console.log('Title:', newTitle.trim())
+                  console.log('Description:', newDescription.trim())
+                  console.log('Priority:', newPriority)
+                  console.log('Due Date:', newDueDate)
+                  console.log('Tags:', newTags)
+                  
                   if (newTitle.trim()) {
+                    console.log('Creating task...')
                     addTask({
                       title: newTitle.trim(),
                       description: newDescription.trim() || undefined,
-                      userId: 'demo', // Replace with actual user id
+                      userId: 'demo-user',
                       isCompleted: false,
                       priority: newPriority,
                       dueDate: newDueDate ? new Date(newDueDate) : undefined,
                       tags: newTags.split(',').map(tag => tag.trim()).filter(tag => tag),
                       isPinned: false,
                     })
+                    console.log('Task added to store')
                     setShowNewTaskModal(false)
                     setNewTitle('')
                     setNewDescription('')
                     setNewPriority('medium')
                     setNewDueDate('')
                     setNewTags('')
+                    alert('Task created successfully!')
+                  } else {
+                    console.log('Title is empty, cannot create task')
+                    alert('Please enter a task title')
                   }
                 }}
                 disabled={!newTitle.trim()}

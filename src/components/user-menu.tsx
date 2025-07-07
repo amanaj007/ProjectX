@@ -15,9 +15,11 @@ import { Settings, LogOut, User as UserIcon } from "lucide-react"
 
 interface UserMenuProps {
   user: User
+  onSettings?: () => void
+  onSignOut?: () => void
 }
 
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ user, onSettings, onSignOut }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -42,12 +44,12 @@ export function UserMenu({ user }: UserMenuProps) {
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={onSettings}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={onSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>

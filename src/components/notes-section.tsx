@@ -24,7 +24,7 @@ interface NotesSectionProps {
 }
 
 export function NotesSection({ showNewNoteModal, setShowNewNoteModal }: NotesSectionProps) {
-  const { getFilteredNotes, pinNote, archiveNote, deleteNote, incrementAccessCount, addNote } = useStore()
+  const { getFilteredNotes, pinNote, archiveNote, deleteNote, incrementAccessCount, addNote, clearSearchFilters } = useStore()
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [newTitle, setNewTitle] = useState('')
   const [newContent, setNewContent] = useState('')
@@ -64,7 +64,9 @@ export function NotesSection({ showNewNoteModal, setShowNewNoteModal }: NotesSec
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Notes</h2>
-        <Button onClick={() => setShowNewNoteModal(true)}>New Note</Button>
+        <Button onClick={() => setShowNewNoteModal(true)}>
+          New Note
+        </Button>
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -99,17 +101,32 @@ export function NotesSection({ showNewNoteModal, setShowNewNoteModal }: NotesSec
                               {note.isPinned && (
                                 <Star className="h-4 w-4 text-yellow-500 fill-current" />
                               )}
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  pinNote(note.id)
-                                }}
-                              >
-                                <MoreVertical className="h-3 w-3" />
-                              </Button>
+                              <div className="flex items-center space-x-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    pinNote(note.id)
+                                  }}
+                                >
+                                  <Star className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 text-red-500 hover:text-red-700"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (confirm('Are you sure you want to delete this note?')) {
+                                      deleteNote(note.id)
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </CardHeader>
@@ -197,16 +214,18 @@ export function NotesSection({ showNewNoteModal, setShowNewNoteModal }: NotesSec
                     addNote({
                       title: newTitle.trim(),
                       content: newContent.trim(),
-                      userId: 'demo', // Replace with actual user id
+                      userId: 'demo-user',
                       tags: newTags.split(',').map(tag => tag.trim()).filter(tag => tag),
                       isPinned: false,
                       isArchived: false,
                       color: undefined,
                     })
+                    clearSearchFilters()
                     setShowNewNoteModal(false)
                     setNewTitle('')
                     setNewContent('')
                     setNewTags('')
+                    alert('Note created successfully!')
                   }
                 }}
                 disabled={!newTitle.trim()}

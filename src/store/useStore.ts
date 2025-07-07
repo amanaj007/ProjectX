@@ -125,13 +125,19 @@ export const useStore = create<AppStore>()(
       // Tasks state
       tasks: [],
       addTask: (taskData) => {
+        console.log('Store addTask called with:', taskData)
         const newTask: Task = {
           ...taskData,
           id: Math.random().toString(36).substr(2, 9),
           createdAt: new Date(),
           updatedAt: new Date(),
         }
-        set((state) => ({ tasks: [newTask, ...state.tasks] }))
+        console.log('Created new task:', newTask)
+        set((state) => {
+          const newState = { tasks: [newTask, ...state.tasks] }
+          console.log('New tasks state:', newState.tasks.length, 'tasks')
+          return newState
+        })
       },
       updateTask: (id, updates) => {
         set((state) => ({
@@ -195,7 +201,11 @@ export const useStore = create<AppStore>()(
         const { notes } = get()
         return notes
           .filter((note) => !note.isArchived)
-          .sort((a, b) => b.lastAccessedAt.getTime() - a.lastAccessedAt.getTime())
+          .sort((a, b) => {
+            const dateA = a.lastAccessedAt instanceof Date ? a.lastAccessedAt : new Date(a.lastAccessedAt)
+            const dateB = b.lastAccessedAt instanceof Date ? b.lastAccessedAt : new Date(b.lastAccessedAt)
+            return dateB.getTime() - dateA.getTime()
+          })
           .slice(0, 5)
       },
       getMostUsedNotes: () => {
@@ -269,7 +279,37 @@ export const useStore = create<AppStore>()(
         tasks: state.tasks,
         theme: state.theme,
         searchFilters: state.searchFilters,
+        user: state.user,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // Convert date strings back to Date objects for notes
+          state.notes = state.notes.map(note => ({
+            ...note,
+            createdAt: new Date(note.createdAt),
+            updatedAt: new Date(note.updatedAt),
+            lastAccessedAt: new Date(note.lastAccessedAt),
+          }))
+          
+          // Convert date strings back to Date objects for tasks
+          state.tasks = state.tasks.map(task => ({
+            ...task,
+            createdAt: new Date(task.createdAt),
+            updatedAt: new Date(task.updatedAt),
+            ...(task.completedAt && { completedAt: new Date(task.completedAt) }),
+            ...(task.dueDate && { dueDate: new Date(task.dueDate) }),
+          }))
+          
+          // Convert date strings back to Date objects for user
+          if (state.user) {
+            state.user = {
+              ...state.user,
+              createdAt: new Date(state.user.createdAt),
+              updatedAt: new Date(state.user.updatedAt),
+            }
+          }
+        }
+      },
     }
   )
 ) 

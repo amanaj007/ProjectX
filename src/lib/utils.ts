@@ -5,20 +5,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatDate(date: Date): string {
+export function formatDate(date: Date | string): string {
+  const dateObj = date instanceof Date ? date : new Date(date)
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(date)
+  }).format(dateObj)
 }
 
-export function formatTime(date: Date): string {
+export function formatTime(date: Date | string): string {
+  const dateObj = date instanceof Date ? date : new Date(date)
   return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-  }).format(date)
+  }).format(dateObj)
 }
 
 export function truncateText(text: string, maxLength: number): string {
