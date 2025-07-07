@@ -87,7 +87,7 @@ export function TasksSection({ showNewTaskModal, setShowNewTaskModal }: TasksSec
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="tasks">
+        <Droppable droppableId="tasks" isDropDisabled={false} isCombineEnabled={false} ignoreContainerClipping={false}>
           {(provided) => (
             <div
               ref={provided.innerRef}

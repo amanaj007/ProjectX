@@ -61,6 +61,7 @@ export default function Home() {
   }, [user, setUser])
 
   const handleNewNote = () => {
+    console.log('Opening new note modal');
     setShowNewNoteModal(true)
   }
 
